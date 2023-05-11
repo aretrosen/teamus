@@ -1,10 +1,10 @@
 # teamus
-Dead simple terminal music player written in go
+Dead simple terminal music player written in go.
 
 ## Purpose
 *Pretty Keybaord centric Terminal Music Player in Go using the popular Charm TUI, with Vim Keybindings*
 
-Most Terminal Music Player today is either not pretty, or have the most unintuitive key bindings. This one is meant to be pretty, without being much resource intensive. Written in Go, it can search for all audio files in your Music Folder, and then Play the songs on `enter`. Check out the project, and click the question mark `?` to get more help.
+Most Terminal Music Player today is either not pretty, or have the most unintuitive key bindings. This one is meant to be pretty, without being much resource intensive. Written in Go, it can search for all audio files in your Music Folder, and then Play the songs on `enter`. Check out the project, and click the question mark `?` to get more help. I love `cmus`, but it isn't pretty, so now we get `teamus`.
 
 ## Build Instructions
 For now, you have to have the golang binary installed. For that, check out, check out ["How to Build and Install Go Programs"](https://www.digitalocean.com/community/tutorials/how-to-build-and-install-go-programs). After that just clone this repository, and type `go run .`. Or maybe you can build the repository using `go build`. Also you can test this repo by using the command `go run github.com/aretrosen/teamus@latest`.
