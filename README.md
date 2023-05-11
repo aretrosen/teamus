@@ -13,7 +13,7 @@ For now, you have to have the golang binary installed. For that, check out, chec
 
 ## TODOs
 
-- [ ] Seamless playing
+- [ ] Seamless playing, with shuffle
 - [ ] Repeat Music / Playlist
 - [ ] Choose files from multiple directories, specified in json.
 - [ ] Load from direectory, refresh only on keypress.
