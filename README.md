@@ -1,5 +1,6 @@
 # teamus
 Dead simple terminal music player written in go.
+<a href="https://asciinema.org/a/p99SQoOJguh0XFajpVpR7Zmyt?autoplay=1"><img src="https://asciinema.org/a/p99SQoOJguh0XFajpVpR7Zmyt.png" width="836"/></a>
 
 ## Purpose
 *Pretty Keybaord centric Terminal Music Player in Go using the popular Charm TUI, with Vim Keybindings*
