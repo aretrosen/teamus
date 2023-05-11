@@ -2,7 +2,8 @@
 Dead simple terminal music player written in go
 
 ## Purpose
-*Pretty Keybaord centric Terminal Music Player in Go using the popular Charm TUI, with Vim Keybindings*
+*Pretty Keybaord centric Terminal Music Player in Go using the popular Charm TUI, with Vim Keybindings*\
+
 Most Terminal Music Player today is either not pretty, or have the most unintuitive key bindings. This one is meant to be pretty, without being much resource intensive. Written in Go, it can search for all audio files in your Music Folder, and then Play the songs on `enter`. Check out the project, and click the question mark `?` to get more help.
 
 ## Build Instructions
