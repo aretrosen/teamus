@@ -193,7 +193,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.progressStr = "--/--"
 			} else {
 				playstatus = "  "
-				m.list.NewStatusMessage("Current Song: " + m.currentlyPlaying.title)
+				m.list.NewStatusMessage("Currently Playing: " + m.currentlyPlaying.title)
 			}
 
 			return m, nil
@@ -257,7 +257,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func tickCmd() tea.Cmd {
-	return tea.Tick(time.Millisecond*100, func(t time.Time) tea.Msg {
+	return tea.Tick(time.Millisecond*250, func(t time.Time) tea.Msg {
 		return tickMsg(t)
 	})
 }

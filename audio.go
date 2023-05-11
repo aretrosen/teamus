@@ -84,6 +84,7 @@ func (p *Player) Close() error {
 func (p *Player) TogglePause() string {
 	if p.audioPlayer.IsPlaying() {
 		p.audioPlayer.Pause()
+		p.current = p.audioPlayer.Current()
 		return "  "
 	}
 	p.audioPlayer.Play()
@@ -120,21 +121,27 @@ func (p *Player) DecreaseVolume() {
 }
 
 func (p *Player) SeekRight() error {
-	pos := p.current + time.Second
+	pos := p.audioPlayer.Current() + time.Second
 	if pos > p.total {
 		pos = p.total
 	}
-	err := p.audioPlayer.Seek(pos)
-	return err
+	if err := p.audioPlayer.Seek(pos); err != nil {
+		return err
+	}
+	p.current = pos
+	return nil
 }
 
 func (p *Player) SeekLeft() error {
-	pos := p.current - time.Second
+	pos := p.audioPlayer.Current() - time.Second
 	if pos < 0 {
 		pos = 0
 	}
-	err := p.audioPlayer.Seek(pos)
-	return err
+	if err := p.audioPlayer.Seek(pos); err != nil {
+		return err
+	}
+	p.current = pos
+	return nil
 }
 
 func (p *Player) Update() (string, float64) {
