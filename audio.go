@@ -102,38 +102,22 @@ func (p *Player) Rewind(idx int) {
 	}
 }
 
-func (p *Player) InreaseVolume() {
-	p.volume128++
+func (p *Player) SetVolume(chg int) {
+	p.volume128 += chg
 	if 128 < p.volume128 {
 		p.volume128 = 128
 	}
-
-	p.audioPlayer.SetVolume(float64(p.volume128) / 128)
-}
-
-func (p *Player) DecreaseVolume() {
-	p.volume128--
 	if p.volume128 < 0 {
 		p.volume128 = 0
 	}
-
 	p.audioPlayer.SetVolume(float64(p.volume128) / 128)
 }
 
-func (p *Player) SeekRight() error {
-	pos := p.audioPlayer.Current() + time.Second
+func (p *Player) Seek(chg int) error {
+	pos := p.audioPlayer.Current() + time.Second*time.Duration(chg)
 	if pos > p.total {
 		pos = p.total
 	}
-	if err := p.audioPlayer.Seek(pos); err != nil {
-		return err
-	}
-	p.current = pos
-	return nil
-}
-
-func (p *Player) SeekLeft() error {
-	pos := p.audioPlayer.Current() - time.Second
 	if pos < 0 {
 		pos = 0
 	}

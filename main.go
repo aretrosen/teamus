@@ -32,6 +32,11 @@ type audiofile struct {
 	audioformat musicType
 }
 
+type (
+	chgVol  int
+	seekPos int
+)
+
 type audioKeyMap struct {
 	Play         key.Binding
 	TogglePause  key.Binding
@@ -54,6 +59,8 @@ type model struct {
 	progressStr      string
 	currentlyPlaying track
 	rewind           bool
+	volumechg        int
+	seekchg          int
 }
 
 type tickMsg time.Time
@@ -200,25 +207,37 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, m.keys.VolumeUp):
 			if player != nil {
-				player.InreaseVolume()
+				m.volumechg++
+				return m, tea.Tick(100*time.Millisecond, func(_ time.Time) tea.Msg {
+					return chgVol(m.volumechg)
+				})
 			}
 			return m, nil
 
 		case key.Matches(msg, m.keys.VolumeDown):
 			if player != nil {
-				player.DecreaseVolume()
+				m.volumechg--
+				return m, tea.Tick(100*time.Millisecond, func(_ time.Time) tea.Msg {
+					return chgVol(m.volumechg)
+				})
 			}
 			return m, nil
 
 		case key.Matches(msg, m.keys.SeekRight):
 			if player != nil {
-				player.SeekRight()
+				m.seekchg++
+				return m, tea.Tick(100*time.Millisecond, func(_ time.Time) tea.Msg {
+					return seekPos(m.seekchg)
+				})
 			}
 			return m, nil
 
 		case key.Matches(msg, m.keys.SeekLeft):
 			if player != nil {
-				player.SeekLeft()
+				m.seekchg--
+				return m, tea.Tick(100*time.Millisecond, func(_ time.Time) tea.Msg {
+					return seekPos(m.seekchg)
+				})
 			}
 			return m, nil
 
@@ -246,6 +265,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		progressModel, cmd := m.progress.Update(msg)
 		m.progress = progressModel.(progress.Model)
 		return m, cmd
+
+	case chgVol:
+		if int(msg) == m.volumechg {
+			player.SetVolume(m.volumechg)
+			m.volumechg = 0
+			return m, nil
+		}
+
+	case seekPos:
+		if int(msg) == m.seekchg {
+			player.Seek(m.seekchg)
+			m.seekchg = 0
+			return m, nil
+		}
 
 	default:
 		return m, nil
