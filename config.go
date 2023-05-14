@@ -28,7 +28,7 @@ func LoadConfig() *Config {
 
 func findConfigFile() []byte {
 	// searches in $HOME/.config
-	configPath := path.Join(mustUserHomeDir(), ".config", "teamus.json")
+	configPath := path.Join(mustUserHomeDir(), ".config", "teamus", "teamus.json")
 	if _, err := os.Stat(configPath); !os.IsNotExist(err) {
 		content, err := os.ReadFile(configPath)
 		if err != nil {
