@@ -321,18 +321,9 @@ func listPaths(roots []string) {
 }
 
 func main() {
-	// TODO: Store it in a database. Searching for files everytime is just plain
-	// retarded. Also add ability to add more paths via json.
-	home, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatal("Cannot find Home Directory" + err.Error())
-	}
-	musdir := filepath.Join(home, "Music")
-	if _, err := os.Stat(musdir); err != nil {
-		log.Fatal("Could not find or open Music Directory" + err.Error())
-	}
+	config := LoadConfig()
 
-	listPaths([]string{musdir})
+	listPaths(config.Directories)
 	var trackList []list.Item
 
 	noOfFiles := len(fileList)
