@@ -33,7 +33,7 @@ File example:
 - [ ] Seamless playing, with shuffle
 - [ ] Repeat Music / Playlist
 - [X] Choose files from multiple directories, specified in json.
-- [ ] Load from direectory, refresh only on keypress.
+- [ ] Load from database, refresh only on keypress.
 
 ### Additional Features
 - [ ] show lyrics on keypress.
