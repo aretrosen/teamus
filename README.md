@@ -16,11 +16,23 @@ For now, you have to have the golang binary installed. For that, check out, chec
 
 **NOTE:** This was made in a Linux environment, with a Music directory. There are plans to add directories via json/yaml file later, but for now you **need** to have the `$HOME/Music` directory. 
 
+## Configuration
+You can specify a list of song directories by creating a JSON file at `$HOME/.config/teamus.json` or `$HOME/.teamus.json`.
+File example:
+```json
+{
+  "directories": [
+    "/home/user/Music",
+    "/home/user/My_Musics"
+  ]
+}
+```
+
 ## TODOs
 
 - [ ] Seamless playing, with shuffle
 - [ ] Repeat Music / Playlist
-- [ ] Choose files from multiple directories, specified in json.
+- [X] Choose files from multiple directories, specified in json.
 - [ ] Load from direectory, refresh only on keypress.
 
 ### Additional Features
