@@ -113,6 +113,20 @@ func (p *Player) SetVolume(chg int) {
 	p.audioPlayer.SetVolume(float64(p.volume128) / 128)
 }
 
+func (p *Player) SeekTo(frac float64) error {
+	pos := time.Duration(float64(p.total.Milliseconds()) * frac * float64(time.Millisecond))
+	if pos > p.total {
+		pos = p.total
+	}
+	if pos < 0 {
+		pos = 0
+	}
+	if err := p.audioPlayer.Seek(pos); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *Player) Seek(chg int) error {
 	pos := p.audioPlayer.Current() + time.Second*time.Duration(chg)
 	if pos > p.total {

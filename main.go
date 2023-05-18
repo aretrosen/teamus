@@ -56,19 +56,30 @@ type model struct {
 	keys             *audioKeyMap
 	audioContext     *audio.Context
 	progress         progress.Model
-	progressStr      string
 	currentlyPlaying track
 	rewind           bool
 	volumechg        int
 	seekchg          int
+	initWinWidth     int
 }
 
 type tickMsg time.Time
 
+type mouseBtnPress int
+
+const (
+	mouseBtnLeft mouseBtnPress = iota
+	mouseBtnRight
+	mouseBtnMiddle
+	mouseBtnNone
+)
+
 var (
-	player     *Player
-	fileList   []audiofile
-	playstatus string
+	player          *Player
+	fileList        []audiofile
+	playstatus      string
+	wasMousePressed mouseBtnPress
+	progressStr     string
 )
 
 func newAudioKeyMap() *audioKeyMap {
@@ -164,13 +175,14 @@ func newModel(trackList []list.Item) *model {
 }
 
 func (m model) Init() tea.Cmd {
-	return tickCmd()
+	return m.tickUpd(0.0)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.progress.Width = msg.Width - 2 - len(playstatus)
+		m.initWinWidth = msg.Width - 2 - len(playstatus)
+		m.progress.Width = m.initWinWidth
 		m.list.SetSize(msg.Width, msg.Height-2)
 		return m, nil
 
@@ -197,7 +209,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			player, err = NewPlayer(fileList[idx].file, m.audioContext, fileList[idx].audioformat)
 			if err != nil {
 				m.list.NewStatusMessage("Cannot Play Audio: " + err.Error())
-				m.progressStr = "--/--"
+				progressStr = "--/--"
+				m.progress.Width = m.initWinWidth - len(progressStr)
 			} else {
 				playstatus = "  "
 				m.list.NewStatusMessage("Currently Playing: " + m.currentlyPlaying.title)
@@ -253,13 +266,34 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 
+	case tea.MouseMsg:
+		mouseEvent := tea.MouseEvent(msg)
+		switch mouseEvent.Type {
+		case tea.MouseLeft:
+			wasMousePressed = mouseBtnLeft
+		case tea.MouseRelease:
+			switch wasMousePressed {
+			case mouseBtnLeft:
+				if player != nil && mouseEvent.Y == 0 && mouseEvent.X >= 1 && mouseEvent.X <= m.progress.Width {
+					player.SeekTo(float64(mouseEvent.X-1) / float64(m.progress.Width))
+					return m, nil
+				}
+				if player != nil && mouseEvent.Y == 0 && mouseEvent.X > m.progress.Width {
+					playstatus = player.TogglePause()
+					return m, nil
+				}
+			}
+			wasMousePressed = mouseBtnNone
+		}
+
 	case tickMsg:
 		fracDone := 0.0
 		if player != nil {
-			m.progressStr, fracDone = player.Update()
+			progressStr, fracDone = player.Update()
+			m.progress.Width = m.initWinWidth - len(progressStr)
 		}
 		cmd := m.progress.SetPercent(fracDone)
-		return m, tea.Batch(tickCmd(), cmd)
+		return m, tea.Batch(m.tickUpd(fracDone), cmd)
 
 	case progress.FrameMsg:
 		progressModel, cmd := m.progress.Update(msg)
@@ -289,15 +323,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func tickCmd() tea.Cmd {
-	return tea.Tick(time.Millisecond*250, func(t time.Time) tea.Msg {
+func (m *model) tickUpd(fracDone float64) tea.Cmd {
+	// if fracDone == 1.0 {
+	// 	print("Here")
+	// }
+	return tea.Tick(time.Millisecond*100, func(t time.Time) tea.Msg {
 		return tickMsg(t)
 	})
 }
 
 func (m model) View() string {
-	m.progress.Width = m.progress.Width - len(m.progressStr)
-	progressive := " " + m.progress.View() + playstatus + m.progressStr + " \n"
+	progressive := " " + m.progress.View() + playstatus + progressStr + " \n"
 	return lipgloss.JoinVertical(lipgloss.Left, progressive, m.list.View())
 }
 
@@ -361,7 +397,7 @@ func main() {
 	}
 
 	m := newModel(trackList)
-	t := tea.NewProgram(*m, tea.WithAltScreen())
+	t := tea.NewProgram(*m, tea.WithAltScreen(), tea.WithMouseAllMotion())
 
 	if _, err := t.Run(); err != nil {
 		log.Fatal(err)
