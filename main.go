@@ -55,7 +55,7 @@ type model struct {
 	keys         *audioKeyMap
 	audioContext *audio.Context
 	progress     progress.Model
-	rewind       bool
+	repeat       bool
 	volumechg    int
 	seekchg      int
 	initWinWidth int
@@ -258,9 +258,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return m, nil
 
-			// TODO: Rewind still not implemented.
 		case key.Matches(msg, m.keys.ToggleRepeat):
-			m.rewind = !m.rewind
+			m.repeat = !m.repeat
 			return m, nil
 		}
 
@@ -335,8 +334,10 @@ func (m *model) nextSong() {
 		player.Rewind(currIdx)
 	}
 
-	currIdx++
-	currIdx %= len(fileList)
+	if !m.repeat {
+		currIdx++
+		currIdx %= len(fileList)
+	}
 
 	var err error
 	player, err = NewPlayer(fileList[currIdx].file, m.audioContext, fileList[currIdx].audioformat)
@@ -345,7 +346,9 @@ func (m *model) nextSong() {
 		m.list.NewStatusMessage("Cannot Play Audio: " + err.Error())
 		progressStr = "--/--"
 		m.progress.Width = m.initWinWidth - len(progressStr)
-		m.nextSong()
+		if !m.repeat {
+			m.nextSong()
+		}
 		return
 	}
 

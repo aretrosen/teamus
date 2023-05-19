@@ -32,15 +32,16 @@ File example:
 
 ## To-dos
 
-- [ ] Seamless playing, with shuffle
-- [ ] Repeat Music / Playlist
+- [x] Seamless Playing
+- [ ] Shuffle
+- [x] Repeat Music / Playlist
 - [x] Choose files from multiple directories, specified in json.
 - [ ] Load from database, refresh only on key press.
 
 ### Additional Features
 
 - [ ] show lyrics on key press.
-- [ ] mouse support. Currently, not implemented as I don't use mouse much. If anybody does though, let me know. Also, I am happy to take contributions!!!
+- [x] basic mouse support added now. If more support is needed, I might consider using bubblezone module.
 - [ ] play `m4a` audio. Currently, even not all `opus` files run correctly. I might have to write many of the audio frameworks from scratch.
 
 ## Collaboration
