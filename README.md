@@ -2,9 +2,12 @@
 
 Dead simple terminal music player written in go.
 
-<a href="https://asciinema.org/a/p99SQoOJguh0XFajpVpR7Zmyt?autoplay=1"><img src="https://asciinema.org/a/p99SQoOJguh0XFajpVpR7Zmyt.png" width="836"/></a>
+https://github.com/aretrosen/teamus/assets/125266845/54d2c00a-dd53-49da-a0b1-4c4cfb5b147f
 
-(Ignore the blocks in the video, I still havent figured out how to use my fonts in asciinema)
+This shows the mouse, seek, play/pause and other features.
+
+(I had to search for music with no copyright. The two music played are Rumors by Neffex, and Cold Funk by Kevin MacLeod.
+
 
 ## Purpose
 
