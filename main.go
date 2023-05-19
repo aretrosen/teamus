@@ -19,7 +19,6 @@ import (
 type track struct {
 	title       string
 	description string
-	idx         int
 }
 
 func (t track) Title() string       { return t.title }
@@ -51,16 +50,15 @@ type audioKeyMap struct {
 }
 
 type model struct {
-	list             list.Model
-	err              error
-	keys             *audioKeyMap
-	audioContext     *audio.Context
-	progress         progress.Model
-	currentlyPlaying track
-	rewind           bool
-	volumechg        int
-	seekchg          int
-	initWinWidth     int
+	list         list.Model
+	err          error
+	keys         *audioKeyMap
+	audioContext *audio.Context
+	progress     progress.Model
+	rewind       bool
+	volumechg    int
+	seekchg      int
+	initWinWidth int
 }
 
 type tickMsg time.Time
@@ -80,6 +78,7 @@ var (
 	playstatus      string
 	wasMousePressed mouseBtnPress
 	progressStr     string
+	currIdx         int
 )
 
 func newAudioKeyMap() *audioKeyMap {
@@ -198,22 +197,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case key.Matches(msg, m.keys.Play):
-			m.currentlyPlaying = m.list.SelectedItem().(track)
-			idx := m.currentlyPlaying.idx
+			currIdx = m.list.Index()
 
 			if player != nil {
-				player.Rewind(idx)
+				player.Rewind(currIdx)
 			}
 
 			var err error
-			player, err = NewPlayer(fileList[idx].file, m.audioContext, fileList[idx].audioformat)
+			player, err = NewPlayer(fileList[currIdx].file, m.audioContext, fileList[currIdx].audioformat)
 			if err != nil {
 				m.list.NewStatusMessage("Cannot Play Audio: " + err.Error())
 				progressStr = "--/--"
 				m.progress.Width = m.initWinWidth - len(progressStr)
 			} else {
 				playstatus = "  "
-				m.list.NewStatusMessage("Currently Playing: " + m.currentlyPlaying.title)
+				m.list.NewStatusMessage("Currently Playing: " + m.list.SelectedItem().(track).title)
 			}
 
 			return m, nil
@@ -324,12 +322,36 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) tickUpd(fracDone float64) tea.Cmd {
-	// if fracDone == 1.0 {
-	// 	print("Here")
-	// }
+	if fracDone == 1.0 {
+		m.nextSong()
+	}
 	return tea.Tick(time.Millisecond*100, func(t time.Time) tea.Msg {
 		return tickMsg(t)
 	})
+}
+
+func (m *model) nextSong() {
+	if player != nil {
+		player.Rewind(currIdx)
+	}
+
+	currIdx++
+	currIdx %= len(fileList)
+
+	var err error
+	player, err = NewPlayer(fileList[currIdx].file, m.audioContext, fileList[currIdx].audioformat)
+
+	if err != nil {
+		m.list.NewStatusMessage("Cannot Play Audio: " + err.Error())
+		progressStr = "--/--"
+		m.progress.Width = m.initWinWidth - len(progressStr)
+		m.nextSong()
+		return
+	}
+
+	m.list.Select(currIdx)
+	playstatus = "  "
+	m.list.NewStatusMessage("Currently Playing: " + m.list.SelectedItem().(track).title)
 }
 
 func (m model) View() string {
@@ -390,7 +412,6 @@ func main() {
 
 		fileList[i].file, fileList[i].audioformat = file, audioformat
 		trackList = append(trackList, track{
-			idx:         i,
 			title:       tr.Title(),
 			description: tr.Album() + "⋅" + tr.Artist(),
 		})

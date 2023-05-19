@@ -28,7 +28,6 @@ type Player struct {
 	audioContext *audio.Context
 	audioPlayer  *audio.Player
 	totalStr     string
-	current      time.Duration
 	total        time.Duration
 	volume128    int
 	musicType    musicType
@@ -84,7 +83,6 @@ func (p *Player) Close() error {
 func (p *Player) TogglePause() string {
 	if p.audioPlayer.IsPlaying() {
 		p.audioPlayer.Pause()
-		p.current = p.audioPlayer.Current()
 		return "  "
 	}
 	p.audioPlayer.Play()
@@ -138,14 +136,11 @@ func (p *Player) Seek(chg int) error {
 	if err := p.audioPlayer.Seek(pos); err != nil {
 		return err
 	}
-	p.current = pos
 	return nil
 }
 
 func (p *Player) Update() (string, float64) {
-	if p.audioPlayer.IsPlaying() {
-		p.current = p.audioPlayer.Current()
-	}
-	timeFrac := float64(p.current.Milliseconds()) / float64(p.total.Milliseconds())
-	return p.current.Truncate(time.Second).String() + " / " + p.totalStr, timeFrac
+	current := p.audioPlayer.Current()
+	timeFrac := float64(current.Milliseconds()) / float64(p.total.Milliseconds())
+	return current.Truncate(time.Second).String() + " / " + p.totalStr, timeFrac
 }
