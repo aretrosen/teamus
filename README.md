@@ -6,7 +6,7 @@ https://github.com/aretrosen/teamus/assets/125266845/54d2c00a-dd53-49da-a0b1-4c4
 
 This shows the mouse, seek, play/pause and other features.
 
-(I had to search for music with no copyright. The two music played are Rumors by Neffex, and Cold Funk by Kevin MacLeod.
+(I had to search for music with no copyright. The two music played are Rumors by Neffex, and Cold Funk by Kevin MacLeod. The recording app is Kooha.)
 
 
 ## Purpose
