@@ -22,7 +22,7 @@ type track struct {
 }
 
 func (t track) Title() string       { return t.title }
-func (t track) FilterValue() string { return t.title }
+func (t track) FilterValue() string { return t.title + " " + t.description }
 func (t track) Description() string { return t.description }
 
 type audiofile struct {
@@ -211,7 +211,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.progress.Width = m.initWinWidth - len(progressStr)
 			} else {
 				playstatus = "  "
-				m.list.NewStatusMessage("Currently Playing: " + m.list.SelectedItem().(track).title)
+				m.list.Title = m.list.SelectedItem().(track).title
 			}
 
 			return m, nil
@@ -334,27 +334,28 @@ func (m *model) nextSong() {
 		player.Rewind(currIdx)
 	}
 
-	if !m.repeat {
-		currIdx++
-		currIdx %= len(fileList)
-	}
-
 	var err error
-	player, err = NewPlayer(fileList[currIdx].file, m.audioContext, fileList[currIdx].audioformat)
+	noOfFiles := len(fileList)
 
-	if err != nil {
+	for {
+		if !m.repeat {
+			currIdx++
+			currIdx %= noOfFiles
+		}
+		player, err = NewPlayer(fileList[currIdx].file, m.audioContext, fileList[currIdx].audioformat)
+		if err == nil {
+			m.list.Select(currIdx)
+			playstatus = "  "
+			m.list.Title = m.list.SelectedItem().(track).title
+			break
+		}
 		m.list.NewStatusMessage("Cannot Play Audio: " + err.Error())
 		progressStr = "--/--"
 		m.progress.Width = m.initWinWidth - len(progressStr)
-		if !m.repeat {
-			m.nextSong()
+		if m.repeat {
+			break
 		}
-		return
 	}
-
-	m.list.Select(currIdx)
-	playstatus = "  "
-	m.list.NewStatusMessage("Currently Playing: " + m.list.SelectedItem().(track).title)
 }
 
 func (m model) View() string {
@@ -416,7 +417,7 @@ func main() {
 		fileList[i].file, fileList[i].audioformat = file, audioformat
 		trackList = append(trackList, track{
 			title:       tr.Title(),
-			description: tr.Album() + "⋅" + tr.Artist(),
+			description: tr.Album() + "⊚ " + tr.Artist(),
 		})
 	}
 
